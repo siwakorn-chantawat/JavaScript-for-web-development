@@ -1,12 +1,12 @@
-//import axios from 'axios';
-
 const blogElement = document.getElementById("blog-container");
 let blogsRawData = [];
 let loadingTimeout = {};
+let limit = 5
 function createBlogHTML(blogs) {
   const blogContentElement = blogs
-    .map(function (blog) {
-      return `<div class="flex flex-col md:flex-row gap-6 w-full">
+    .map(function (blog, i) {
+      if (i < limit) {
+        return `<div class="flex flex-col md:flex-row gap-6 w-full">
     <img
       src="${blog.imageUrl}"
       alt="feature image 1"
@@ -23,17 +23,24 @@ function createBlogHTML(blogs) {
       <a href="${blog.url}" class="text-wd-brand">Read more</a>
     </div>
     </div>`;
+      }
     })
     .join("");
 
   blogElement.innerHTML = blogContentElement;
 }
 
+function readMore() {
+limit+= 5 
+createBlogHTML(blogsRawData)
+}
+
 function searchBlogs(element) {
+  console.log(loadingTimeout);
   clearTimeout(loadingTimeout);
   blogElement.innerHTML = "Loading...";
 
-  loadingTimeout = setTimeout(() => {
+  const searchTime = () => {
     const filteredBlogs = blogsRawData.filter(function (blog) {
       return (
         blog.title.includes(element.value) ||
@@ -41,10 +48,13 @@ function searchBlogs(element) {
       );
     });
     createBlogHTML(filteredBlogs);
-  }, 2000);
+  };
+
+  loadingTimeout = setTimeout(searchTime, 2000);
 }
 
 function sortBlogs(element) {
+  console.log(loadingTimeout);
   clearTimeout(loadingTimeout);
   blogElement.innerHTML = "Loading...";
   loadingTimeout = setTimeout(() => {
